@@ -1,0 +1,12 @@
+****Comprehension du probleme****
+Je dois creer tic tac toe. C'est quoi exacement? 
+C'est un jeu qui se joue a deux sur un plateau de 9 case en 3*3; chaque joueur a un symbole distinct
+Les joueur deposent leur symbole tour a tour uniquement sur les case vides. Une fois qu'un joueur aligne
+3 de ses symboles sur sur une ligne entiere ou une colonne entiere alors il gagne la partie. Cependant si personne 
+ne reussit a le faire et que toutes les cases sont pleines alors match null.
+
+****division*****
+creer un module qui contient :
+    creer la table de 9 cellules;
+    Ecrire une logique pour prendre les noms des joueurs et associer le premier au symbole "x" et au 2e "o";
+    
