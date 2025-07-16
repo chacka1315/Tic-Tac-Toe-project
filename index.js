@@ -57,38 +57,58 @@ function GameController(){
                 && currentGameBoard[i][0] === currentGameBoard[i][2]){    
                 return getActivePlayer().name
             }
+        }
 
-            // check win in column
-            else if (currentGameBoard[0][i] 
+
+        // check win in column
+        for (let i = 0; i < 3; i++) {
+            if (currentGameBoard[0][i] 
                 && currentGameBoard[0][i] === currentGameBoard[1][i]
                 && currentGameBoard[0][i] === currentGameBoard[2][i]){    
                 return getActivePlayer().name
             }
-            
-            //check win on the diagonal
-            else if (currentGameBoard[2][0] 
-                && currentGameBoard[2][0] === currentGameBoard[2][1]
-                && currentGameBoard[2][0] === currentGameBoard[2][2]){    
-                return getActivePlayer().name
-            }
+        }
+          
+        
+        //check win on the diagonal
+        if (currentGameBoard[2][0] 
+            && currentGameBoard[2][0] === currentGameBoard[1][1]
+            && currentGameBoard[2][0] === currentGameBoard[0][2]){    
+            return getActivePlayer().name
+        }
 
             //check win on the diagonal
-            else if (currentGameBoard[0][0] 
-                && currentGameBoard[0][0] === currentGameBoard[1][1]
-                && currentGameBoard[0][0] === currentGameBoard[2][2]){    
-                return getActivePlayer().name
-            }
-            else{ return null}
+        if (currentGameBoard[0][0] 
+            && currentGameBoard[0][0] === currentGameBoard[1][1]
+            && currentGameBoard[0][0] === currentGameBoard[2][2]){    
+            return getActivePlayer().name
         }
+        
+        return null
     }
 
 
+
+    // check if the board is fill
+    const checkDraw = () => {
+        const currentGameBoard = board.getBoard();
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 3; j++){
+                if (currentGameBoard[i][j] === undefined) {
+                    return false
+                }
+            }     
+        }
+        return true
+    }
+
+    // function that start a round
     const playRound = (row, column) => {
         console.log(`${getActivePlayer().name} drop is token ${getActivePlayer().token} in to row ${row}, column ${column}`);
         board.dropToken(row, column, getActivePlayer().token );
        
     }
-    return{playRound, checkWinner, switchPayer, printNewRound}   
+    return{playRound, checkWinner, switchPayer, printNewRound, checkDraw}   
 }
 
 //lunch instance
@@ -96,18 +116,25 @@ const board = Gameboard()
 const game = GameController();
 
 
-for (let i = 0; i < 10; i++) {
+//loop for a game start
+while (true) {
     game.printNewRound();
     board.printBoardTable();
     x = prompt("entrez ligne")
     y = prompt("entrez col")
     game.playRound(x, y)
     const winner = game.checkWinner();
+    const isDraw = game.checkDraw();
     if (winner){
         board.printBoardTable();
-        console.log(`${winner} win the game`) 
-        break
+        console.log(`${winner} win the game`);
+        break;
+    } else if (isDraw) {
+        board.printBoardTable();
+        console.log("It's DRAW !");
+        break;
     }
+    
     
     game.switchPayer();
       
