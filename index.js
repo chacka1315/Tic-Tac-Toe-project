@@ -3,7 +3,7 @@
 function Gameboard() {
     const column = 3;
     const row = 3;
-    boardTable = [];
+    let boardTable = [];
 
     for (let i = 0; i < row; i++) {
         boardTable[i] = [];
@@ -17,6 +17,10 @@ function Gameboard() {
     const dropToken = (row, column, token) => {
         if (boardTable[row][column] === undefined){
             boardTable[row][column] = token;
+            return true
+        } else {
+            console.log("Invalid drop!");
+            return false   
         }
     }
 
@@ -104,11 +108,24 @@ function GameController(){
 
     // function that start a round
     const playRound = (row, column) => {
-        console.log(`${getActivePlayer().name} drop is token ${getActivePlayer().token} in to row ${row}, column ${column}`);
-        board.dropToken(row, column, getActivePlayer().token );
-       
-    }
-    return{playRound, checkWinner, switchPayer, printNewRound, checkDraw}   
+        const isValid = board.dropToken(row, column, getActivePlayer().token );
+        if (isValid){
+            const winner = checkWinner();
+            const isDraw = checkDraw();
+            if(winner){
+                return {status : "win", winner}
+
+            } else if (isDraw) {
+                return {status : "draw"}
+            }
+            switchPayer();
+            return {status : "continue" }
+        }else {
+            return {status : "invalid"}
+        }
+    }       
+    return{playRound, printNewRound, getActivePlayer}   
+
 }
 
 //lunch instance
@@ -122,21 +139,20 @@ while (true) {
     board.printBoardTable();
     x = prompt("entrez ligne")
     y = prompt("entrez col")
-    game.playRound(x, y)
-    const winner = game.checkWinner();
-    const isDraw = game.checkDraw();
-    if (winner){
+    const result = game.playRound(x, y);
+    if (result.status === "continue") {
+        const activePlayer = game.getActivePlayer();
+        console.log(`${activePlayer.name} drop is token ${activePlayer.token} in to row ${x}, column ${y}`);
+    }else if (result.status === "win"){
         board.printBoardTable();
-        console.log(`${winner} win the game`);
+        console.log(`${result.winner} win the game`);
         break;
-    } else if (isDraw) {
+    }else if (result.status === "draw" ) {
         board.printBoardTable();
         console.log("It's DRAW !");
         break;
     }
-    
-    
-    game.switchPayer();
+} 
       
-}
+
 

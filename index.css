@@ -1,0 +1,21 @@
+
+
+.container {
+
+    height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+}
+
+.content{
+    display: grid;
+    background-color: #14bdac ;
+}
+
+.board{
+    place-self: center;
+    display: grid;
+    grid-template-columns: repeat(3, 100px);
+    grid-template-rows: repeat(3, 100px);
+}
+
