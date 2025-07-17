@@ -1,21 +1,273 @@
 
+/* reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+body {
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+p, h1, h2, h3, h4, h5, h6 {
+  overflow-wrap: break-word;
+}
+
+p {
+  text-wrap: pretty;
+}
+h1, h2, h3, h4, h5, h6 {
+  text-wrap: balance;
+}
+
+/* variables */
+:root{
+    --primary : #14bdac;
+    --secondly : #ffffff;
+    --tertiary : orange;
+    --border-color-container: #ffffff;
+    --game-name-color: #ffffff;
+    --token-font-size : 4rem;
+    --font-family-text : "Open Sans";
+}
+
 
 .container {
-
     height: 100vh;
     display: grid;
-    grid-template-columns: 1fr 2fr;
+    grid-template-columns: 1fr 1.7fr;
+    overflow: hidden;
+    font-family: var(--font-family-text), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif
 }
 
 .content{
     display: grid;
-    background-color: #14bdac ;
+    background-color: var(--primary) ;
+    grid-template-rows: 100px 500px;
 }
 
 .board{
     place-self: center;
     display: grid;
-    grid-template-columns: repeat(3, 100px);
-    grid-template-rows: repeat(3, 100px);
+    grid-template-columns: repeat(3, minmax(50px, 120px));
+    grid-template-rows: repeat(3, minmax(50px, 120px));
+    background-color: var(--primary);
 }
 
+.cell{
+    border: #00000050 solid 3px;
+    cursor: pointer;
+    background-color: var(--primary);
+    font-size: var(--token-font-size);
+    font-size: 2rem;
+    transition: all 0.4s ease-out;
+}
+.cell_disabled {
+    border: #00000010 solid 3px;
+    cursor: pointer;
+    background-color: var(--primary);
+    font-size: var(--token-font-size);
+    font-size: 2rem;
+    transition: all 1s ease-out;
+}
+
+.cell:disabled{
+    background-color: var(--primary);
+}
+
+
+.tokenX{
+    color: black;
+    font-weight: bold;
+    font-size: 5rem;
+}
+
+.tokenO{
+    color: bisque;
+    font-weight: bold;
+    font-size: 5rem;
+}
+
+
+.playersInfo{
+    background-color: var(--secondly);
+    display: grid;
+    grid-template-rows: 100px 200px 110px 70px 100px  ;
+    
+}
+
+h1{
+    padding-top: 20px;
+    justify-self: center;
+    font-family: Bungee, system-ui, sans-serif;
+    color: var(--secondly);
+    font-size: 4rem;
+}
+
+.playersInfo > div:first-child {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    place-self: center;
+    font-size: clamp(10px, 1.4rem, 20px);
+    font-weight: 600;
+    color: var(--primary);
+    font-family: Bungee, system-ui, sans-serif;
+}
+
+
+/* form style */
+fieldset {
+    border: 3px solid #00000050;
+    margin: 10px;
+    color: var(--primary);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 30px;
+}
+
+label{
+    font-weight: 600;
+    font-size: clamp(12px, 1.2rem, 50px);
+}
+
+.textTokenO{
+    color: bisque;
+    font-weight: bold;
+}
+
+.textTokenX{
+    color: black;
+    font-weight: bold; 
+}
+
+.tokenXbottom{
+    color: black;
+    font-weight: bold;
+    font-size: 7rem;
+    place-self: center;
+}
+
+.tokenObottom{
+    color: bisque;
+    font-weight: bold;
+    font-size: 7rem;
+    place-self: center;
+}
+input{
+    height: 30px;
+    width: 50%;
+    border: var(--primary), 2px solid;
+    border-radius: 10px;
+    padding: 10px;
+    
+}
+
+#player1:focus{
+    outline: none;
+    border: 4px solid black;
+    background-color: #ffffff;
+ }
+
+#player2:focus{
+    outline: none;
+    border: 4px solid bisque;
+    background-color: #ffffff;
+ }
+
+.turn{
+    place-self: start center;
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--tertiary);
+    padding: 0 10px;
+    
+}
+
+.win{
+    place-self: start center;
+    text-align: center;
+    font-size: 3.5rem;
+    letter-spacing: 6px;
+    line-height: 50px;
+    font-weight: 900;
+    padding: 0 10px;
+    text-transform: uppercase;
+    color: var(--primary);
+    transition: all 0.5s ease-out;
+}
+.draw{
+    place-self: start center;
+    text-align: center;
+    font-size: 3rem;
+    font-weight: 900;
+    padding: 0 10px;
+    text-transform: uppercase;
+    color: var(--primary);
+    transition: all 0.5s ease-out;
+}
+
+svg{
+    width: 80px;
+    height: auto;
+    fill: var(--primary);
+    place-self: center;
+}
+
+#start{
+    place-self: center;
+    width: 150px;
+    height: 50px;
+    background-color: var(--tertiary);
+    color: #ffffff;
+    font-size: 1.3rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    box-shadow: 2px 2px 4px black;
+}
+
+#start:active{
+    transform: scale(0.95);
+    box-shadow: 0 0 0;
+}
+
+#start+div {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: 100px;
+    column-gap: 50px;
+    margin: 20px;
+    place-self: center;
+}
+#btn_00,
+#btn_01,
+#btn_02{
+    border-top: none;
+}
+
+#btn_20,
+#btn_21,
+#btn_22{
+    border-bottom: none;
+}
+
+#btn_02,
+#btn_12,
+#btn_22{
+    border-right: none;
+}
+
+#btn_00,
+#btn_10,
+#btn_20{
+    border-left: none;
+}

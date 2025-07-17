@@ -1,16 +1,20 @@
 
 // game state factory
-function Gameboard() {
+const Gameboard = (function() {
     const column = 3;
     const row = 3;
     let boardTable = [];
 
-    for (let i = 0; i < row; i++) {
-        boardTable[i] = [];
-        for (let j = 0; j < column; j++) {
-            boardTable[i][j] = "";
-        }  
+    //create new board
+    const resetBoard = () => {
+        for (let i = 0; i < row; i++) {
+            boardTable[i] = [];
+            for (let j = 0; j < column; j++) {
+                boardTable[i][j] = "";
+            }  
+        }
     }
+    
 
     const getBoard = () => boardTable;
 
@@ -27,20 +31,39 @@ function Gameboard() {
     const printBoardTable = () => {
         console.table(getBoard())
     }
+    resetBoard();
+    return{getBoard, dropToken, printBoardTable, resetBoard}
+})();
 
-    return{getBoard, dropToken, printBoardTable}
-}
+
+const dropBtns = document.querySelectorAll(".dropBtn");
+const btnStart = document.querySelector("#start");
+const playerInput1 = document.querySelector("input[id='player1']");
+const playerInput2 = document.querySelector("input[id='player2']");
+ const turn = document.querySelector(".turn");
+
+// const resultMsg = document.querySelector(".resultMsg");
 
 
 // game play logique that manage turn and end the game
-function GameController(){
+const GameController = (function(){
     const createPlayer = (name, token) => {
     return {name, token}
     }
 
-    const player1 = createPlayer("siaka", "X")
-    const player2 = createPlayer("billion", "O")
+    let player1 = createPlayer(playerInput1.value || "player1", "X");
+    let player2 = createPlayer(playerInput2.value || "player2", "O");
 
+    let currentGameBoard = Gameboard.getBoard();
+    //reset the game
+    const resetGame = () => {
+        Gameboard.resetBoard();
+        currentGameBoard = Gameboard.getBoard();
+        player1 = createPlayer(playerInput1.value || "player1", "X");
+        player2 = createPlayer(playerInput2.value || "player2", "O");
+        activePlayer = player1;   
+    }
+    
     let activePlayer = player1;
     const switchPayer = () => {
         activePlayer = activePlayer === player1? player2 : player1; 
@@ -49,14 +72,12 @@ function GameController(){
     const getActivePlayer = () => activePlayer;
 
     //print the player turn name
-    const turn = document.querySelector(".turn")
     const printNewRound = () => {
-        turn.textContent = `It's ${getActivePlayer().name} turn`
-        console.log(`It's ${getActivePlayer().name} turn`);
+        turn.textContent = `It's ${getActivePlayer().name} turn...`
     }
 
     const checkWinner = () => {
-        const currentGameBoard = board.getBoard();
+        currentGameBoard = Gameboard.getBoard();
         //check win in row
         for (let i = 0; i < 3; i++) {
             if (currentGameBoard[i][0] 
@@ -98,7 +119,7 @@ function GameController(){
 
     // check if the board is fill
     const checkDraw = () => {
-        const currentGameBoard = board.getBoard();
+        const currentGameBoard = Gameboard.getBoard();
         for (let i = 0; i < 3; i++) {
             for (let j = 0; j < 3; j++){
                 if (currentGameBoard[i][j] === "") {
@@ -111,7 +132,7 @@ function GameController(){
 
     // function that start a round
     const playRound = (row, column) => {
-        const isValid = board.dropToken(row, column, getActivePlayer().token );
+        const isValid = Gameboard.dropToken(row, column, getActivePlayer().token );
         if (isValid){
             const winner = checkWinner();
             const isDraw = checkDraw();
@@ -127,16 +148,12 @@ function GameController(){
             return {status : "invalid"}
         }
     }       
-    return{playRound, printNewRound, getActivePlayer, switchPayer}   
-}
+    return{playRound, printNewRound, getActivePlayer, switchPayer, createPlayer, resetGame}   
+})();
 
 
 //display functions factory
-function ScreenController (){
-    const game = GameController();
-    const player1 = document.querySelector("input[id='player1']");
-    const player2 = document.querySelector("input[id='player2']");
-
+const ScreenController = (function  (){
     //get all board buttons
     const column = 3;
     const row = 3;
@@ -150,99 +167,114 @@ function ScreenController (){
 
     //logic that end the game
     const stopGame = () => {
-        pageBoardTab.forEach(row => {
-            row.forEach (button => {
-                button.disabled = true
-            })
-        })
-    }
+        dropBtns.forEach(button => {
+        button.disabled = true;
+        });
+    };
+
 
     //get screen bord
-    const getPageBoardTab = () => pageBoardTab
+    const getPageBoardTab = () => pageBoardTab;
 
 
     //update screen after drop
     const updateScreen = () => {
-        const currentBoard = board.getBoard()
+        const currentBoard = Gameboard.getBoard();
         const currentPageBoard = getPageBoardTab();
 
         for (let i = 0; i < 3; i++) {
             for (let j = 0; j < 3; j++) {
-                currentPageBoard[i][j].textContent = `${currentBoard[i][j]}` 
+                currentPageBoard[i][j].textContent = `${currentBoard[i][j]}`
+                if (currentBoard[i][j] === "X") {
+                    currentPageBoard[i][j].classList.add("tokenX");
+                }else if (currentBoard[i][j] === "O"){
+                    currentPageBoard[i][j].classList.add("tokenO")
+                }
             }   
         }       
     }
 
 
-    //select where i will display win or display message
-    const message = document.querySelector(".message");
+    const setInactiveGameBtn = () =>{
+        dropBtns.forEach(button => {
+            button.classList.add("cell_disabled");
+            button.classList.remove("cell");
+        })
+    }
 
     //manage the clicks
-    pageBoardTab.forEach(row => {
-        row.forEach (button => {
-            button.addEventListener("click", () => {
-                button.disabled = true; 
-                let row = Number(button.id[4]);
-                let column = Number(button.id[5]);
-                const result = game.playRound(row, column);
-                if (result.status === "continue") {
-                    const activePlayer = game.getActivePlayer();
-                    console.log(`${activePlayer.name} drop is token ${activePlayer.token} in to row ${row}, column ${column}`);
-                    game.switchPayer();
-                    game.printNewRound();
-                }else if (result.status === "win"){
-                    board.printBoardTable();
-                    message.textContent = `${result.winner} win the game`;
-                    console.log(`${result.winner} win the game`);
-                    stopGame();
-                }else if (result.status === "draw" ) {
-                    board.printBoardTable();
-                    message.textContent = "It's DRAW !";
-                    console.log("It's DRAW !");
-                    stopGame();
-                }
-                updateScreen();
+    const initial = function(){
+        pageBoardTab.forEach(row => {
+            row.forEach (button => {
+                button.disabled = true;
+                setInactiveGameBtn();
+                button.addEventListener("click", () => {
+                    button.disabled = true;
+                    let row = Number(button.id[4]);
+                    let column = Number(button.id[5]);
+                    const result = GameController.playRound(row, column);
+                    if (result.status === "continue") {
+                        GameController.switchPayer();
+                        GameController.printNewRound();
+                    }else if (result.status === "win"){
+                        turn.textContent = `${result.winner} wins!`;
+                        turn.classList.add("win");
+                        setInactiveGameBtn();
+                        stopGame();
+                    }else if (result.status === "draw" ) {
+                        turn.textContent = "It's DRAW !";
+                        turn.classList.add("draw");
+                        setInactiveGameBtn();
+                        stopGame();
+                    }
+                    updateScreen();
+                    
+                }) 
                 
             }) 
             
         }) 
-           
-    }) 
-    updateScreen();
-    game.printNewRound();
-}
+        updateScreen();
+    };
 
+    const resetCssClass = () => {
+        dropBtns.forEach(button => {
+            button.classList.remove("tokenX");
+            button.classList.remove("tokenO");
+            button.classList.remove("cell_disabled");
+            button.classList.add("cell");
+        });
+        
+        turn.classList.remove("win");
+        turn.classList.remove("draw");
+        
+    }
 
+    const reset = () => {
+        GameController.resetGame();
+        dropBtns.forEach(button => {
+        button.disabled = false;
+        });
+        GameController.printNewRound();
+        resetCssClass();
+        updateScreen();
+    }
+    return{initial, reset}
 
-
+    
+})();
 
 
 
 //lunch instance
-const board = Gameboard();
-//const game = GameController();
-const gameScreen = ScreenController();
 
-//loop for a game start
-// while (true) {
-//     game.printNewRound();
-//     board.printBoardTable();
-//     x = prompt("entrez ligne")
-//     y = prompt("entrez col")
-//     const result = game.playRound(x, y);
-//     if (result.status === "continue") {
-//         const activePlayer = game.getActivePlayer();
-//         console.log(`${activePlayer.name} drop is token ${activePlayer.token} in to row ${x}, column ${y}`);
-//     }else if (result.status === "win"){
-//         board.printBoardTable();
-//         console.log(`${result.winner} win the game`);
-//         break;
-//     }else if (result.status === "draw" ) {
-//         board.printBoardTable();
-//         console.log("It's DRAW !");
-//         break;
-//     }
-// } 
+ScreenController.initial();
+
+btnStart.addEventListener("click", () => ScreenController.reset() );
+
+
+
+
       
 
 
